@@ -34,7 +34,6 @@ export default function() {
   function drag(selection) {
     selection
         .on("pointerdown.drag", pointerdowned)
-        // .on("touchstart.drag", touchstarted)
         .on("pointermove.drag", pointermoved)
         .on("pointerup.drag pointercancel.drag", pointerended)
         .style("-webkit-tap-highlight-color", "rgba(0,0,0,0)");
@@ -66,7 +65,6 @@ export default function() {
     if (gesture){
       gesture("drag");
     }
-
   }
 
   function pointerended() {
@@ -104,47 +102,6 @@ export default function() {
       customEvent(new DragEvent(drag, type, s, id, n, p[0] + dx, p[1] + dy, p[0] - p0[0], p[1] - p0[1], sublisteners), sublisteners.apply, sublisteners, [type, that, args]);
     };
   }
-  // function touchstarted() {
-  //   if (!filter.apply(this, arguments)) return;
-  //   var touches = event.changedTouches,
-  //       c = container.apply(this, arguments),
-  //       n = touches.length, i, gesture;
-  //
-  //   for (i = 0; i < n; ++i) {
-  //     if (gesture = beforestart(touches[i].identifier, c, touch, this, arguments)) {
-  //       nopropagation();
-  //       gesture("start");
-  //     }
-  //   }
-  // }
-
-  // function touchmoved() {
-  //   var touches = event.changedTouches,
-  //       n = touches.length, i, gesture;
-  //
-  //   for (i = 0; i < n; ++i) {
-  //     if (gesture = gestures[touches[i].identifier]) {
-  //       noevent();
-  //       gesture("drag");
-  //     }
-  //   }
-  // }
-  //
-  // function touchended() {
-  //   var touches = event.changedTouches,
-  //       n = touches.length, i, gesture;
-  //
-  //   if (touchending) clearTimeout(touchending);
-  //   touchending = setTimeout(function() { touchending = null; }, 500); // Ghost clicks are delayed!
-  //   for (i = 0; i < n; ++i) {
-  //     if (gesture = gestures[touches[i].identifier]) {
-  //       nopropagation();
-  //       gesture("end");
-  //     }
-  //   }
-  // }
-
-
 
   drag.filter = function(_) {
     return arguments.length ? (filter = typeof _ === "function" ? _ : constant(!!_), drag) : filter;
