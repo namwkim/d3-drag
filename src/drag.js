@@ -7,7 +7,7 @@ import DragEvent from "./event";
 
 // Ignore right-click, since that should open the context menu.
 function defaultFilter() {
-  return true;
+  return !event.button;
 }
 
 function defaultContainer() {
@@ -18,10 +18,15 @@ function defaultSubject(d) {
   return d == null ? {x: event.x, y: event.y} : d;
 }
 
+function defaultTouchable() {
+  return "ontouchstart" in this;
+}
+
 export default function() {
   var filter = defaultFilter,
       container = defaultContainer,
       subject = defaultSubject,
+      touchable = defaultTouchable,
       gestures = {},
       listeners = dispatch("start", "drag", "end"),
       active = 0,
@@ -36,6 +41,8 @@ export default function() {
         .on("pointerdown.drag", pointerdowned)
         .on("pointermove.drag", pointermoved)
         .on("pointerup.drag pointercancel.drag", pointerended)
+      .filter(touchable)
+        .style("touch-action", "none")
         .style("-webkit-tap-highlight-color", "rgba(0,0,0,0)");
   }
 
@@ -43,9 +50,7 @@ export default function() {
     if (!filter.apply(this, arguments)) return;
     var gesture = beforestart(event.pointerId, container.apply(this, arguments), mouse, this, arguments);
     if (!gesture) return;
-    if (event.pointerType!='touch'){
-      select(event.view).on("pointermove.drag", pointermoved, true).on("pointerup.drag", pointerended, true);
-    }
+    // select(event.view).on("pointermove.drag", pointermoved, true).on("pointerup.drag", pointerended, true);
     nodrag(event.view);
     nopropagation();
     pointermoving = false;
@@ -55,7 +60,6 @@ export default function() {
   }
 
   function pointermoved() {
-    if (!filter.apply(this, arguments)) return;
     noevent();
     if (!pointermoving) {
       var dx = event.clientX - pointerdownx, dy = event.clientY - pointerdowny;
@@ -68,10 +72,7 @@ export default function() {
   }
 
   function pointerended() {
-    if (!filter.apply(this, arguments)) return;
-    if (event.pointerType!='touch'){
-      select(event.view).on("pointermove.drag pointerup.drag", null);
-    }
+    select(event.view).on("pointermove.drag pointerup.drag", null);
     yesdrag(event.view, pointermoving);
     noevent();
 
@@ -80,6 +81,7 @@ export default function() {
       gesture("end");
     }
   }
+  
 
   function beforestart(id, container, point, that, args) {
     var p = point(container, id), s, dx, dy,
@@ -113,6 +115,10 @@ export default function() {
 
   drag.subject = function(_) {
     return arguments.length ? (subject = typeof _ === "function" ? _ : constant(_), drag) : subject;
+  };
+
+  drag.touchable = function(_) {
+    return arguments.length ? (touchable = typeof _ === "function" ? _ : constant(!!_), drag) : touchable;
   };
 
   drag.on = function() {
