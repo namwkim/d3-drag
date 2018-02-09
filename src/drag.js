@@ -39,8 +39,8 @@ export default function() {
   function drag(selection) {
     selection
         .on("pointerdown.drag", pointerdowned)
-        .on("pointermove.drag", pointermoved)
-        .on("pointerup.drag pointercancel.drag", pointerended)
+        // .on("pointermove.drag", pointermoved)
+        // .on("pointerup.drag pointercancel.drag", pointerended)
       .filter(touchable)
         .style("touch-action", "none")
         .style("-webkit-tap-highlight-color", "rgba(0,0,0,0)");
@@ -50,7 +50,7 @@ export default function() {
     if (!filter.apply(this, arguments)) return;
     var gesture = beforestart(event.pointerId, container.apply(this, arguments), mouse, this, arguments);
     if (!gesture) return;
-    // select(event.view).on("pointermove.drag", pointermoved, true).on("pointerup.drag", pointerended, true);
+    select(event.view).on("pointermove.drag", pointermoved, true).on("pointerup.drag  pointercancel.drag", pointerended, true);
     nodrag(event.view);
     nopropagation();
     pointermoving = false;
